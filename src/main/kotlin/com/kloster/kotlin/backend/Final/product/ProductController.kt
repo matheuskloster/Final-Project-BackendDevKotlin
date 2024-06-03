@@ -3,6 +3,7 @@ package com.kloster.kotlin.backend.Final.productpackage
 import com.kloster.kotlin.backend.Final.product.Product
 import com.kloster.kotlin.backend.Final.product.ProductService
 import io.swagger.annotations.Api
+import org.hibernate.query.SortDirection
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,15 +15,12 @@ class ProductController(private val service: ProductService) {
     fun findAll(@RequestParam(required = false) name: String,
                 @RequestParam(defaultValue = "name") sortBy: String,
                 @RequestParam(defaultValue = "0") page: Int,
-                @RequestParam(defaultValue = "10") size: Int
-    ) = service.findSort(name, sortBy, page, size)
+                @RequestParam(defaultValue = "10") size: Int,
+                @RequestParam(defaultValue = "ASC") direction: String
+    ) = service.findSort(name, sortBy, page, size, direction)
 
     @GetMapping
     fun findAll() = service.findAll()
-
-    // @GetMapping("/search/{name}")
-    //fun findByName(@PathVariable name: String) = service.findByName(name)
-
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long) = service.getById(id)

@@ -36,6 +36,7 @@ dependencies {
 	implementation("io.springfox:springfox-swagger-ui:3.0.0")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.projectlombok:lombok:1.18.20")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("javax.servlet:javax.servlet-api:3.1.0")
 	runtimeOnly("org.postgresql:postgresql")

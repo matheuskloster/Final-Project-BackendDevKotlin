@@ -1,5 +1,6 @@
 package com.kloster.kotlin.backend.Final.product
 
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -7,30 +8,28 @@ import org.springframework.stereotype.Service
 @Service
 class ProductService(private val repository: ProductRepository) {
 
-    fun findSort(name: String?, sortBy: String, page: Int, size: Int): List<Product> {
-        val sort = Sort.by(Sort.Direction.ASC, sortBy)
+    fun findSort(name: String?, sortBy: String, page: Int, size: Int, direction: String): List<Product> {
+        val sort = Sort.by(Sort.Direction.fromString(direction), sortBy)
         val pageable = PageRequest.of(page, size, sort)
 
-        var products: List<Product>  = emptyList()
+        var products: List<Product> = emptyList()
 
         if (name != null) {
             products = repository.findByNameContaining(name)
         } else {
-            products =repository.findAll(pageable).content
+            products = repository.findAll(pageable).content
         }
 
         return products.sortedWith(compareBy {
             when (sortBy) {
-                "price" -> it.price
-                "name" -> it.name
-                else -> it.id
+                "price" -> if (direction == "ASC") it.price else -it.price
+                "name" -> if (direction == "ASC") it.name else it.name.reversed()
+                else -> if (direction == "ASC") it.id else -it.id
             }
         })
 
 
     }
-
-    fun findByName(name: String): List<Product> = repository.findByNameContaining(name)
 
     fun findAll(): List<Product> = repository.findAll()
 
@@ -43,5 +42,11 @@ class ProductService(private val repository: ProductRepository) {
         return repository.save(product.copy(id = id))
     }
 
-    fun delete(id: Long) = repository.deleteById(id)
+    fun delete(id: Long) {
+        try {
+            repository.deleteById(id)
+        } catch (e: DataIntegrityViolationException) {
+            throw Exception("Erro ao deletar o produto com id: $id", e)
+        }
+    }
 }
